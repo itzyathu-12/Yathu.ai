@@ -4,16 +4,24 @@
 
 Yathu.ai is a Windows-first desktop companion built around one simple idea: your computer should feel different when you study, code, focus, or take a break.
 
-> “Hey Yathu” — your assistant is ready.
+> “Hey Yathu” is the planned wake phrase.
 
 ## Current direction
 
-- A native-feeling desktop app built with Electron, React, and TypeScript.
-- A calm, distinctive interface inspired by the structure and clarity of DEVTEX, with its own midnight-green, sage, and warm-neutral visual identity.
+- Electron + React + TypeScript desktop shell.
+- A calm, distinctive interface with its own midnight-green, sage, and warm-neutral visual identity.
 - Workspace modes: Everyday, Study, Coding, Focus, and Chill.
-- Planned voice activation with the wake phrase **Hey Yathu**.
-- Planned keyboard activation with **Ctrl + Space**.
-- Local-first command handling, with optional AI providers for more complex requests.
+- Keyboard activation with **Ctrl + Space**.
+- Planned, optional local wake-word detection.
+- Local-first command handling, with optional AI providers for complex requests.
+
+## Resource-first design
+
+Yathu is designed to stay idle when not in use: no background AI calls, periodic network requests, resident model, or polling-based monitor. The microphone is disabled in this prototype. Resource metrics can be sampled manually from the dashboard.
+
+The target is **under 1% average idle CPU**, to be verified on a packaged Windows build. This is a target, not a benchmark claim. RAM is tracked separately in MB because a percentage varies with the computer's installed memory.
+
+See [docs/RESOURCE_POLICY.md](docs/RESOURCE_POLICY.md) for the performance budget and Windows benchmark procedure.
 
 ## Getting started
 
@@ -28,13 +36,14 @@ Build the desktop application:
 
 ```bash
 npm run build
+npm run typecheck
 ```
 
-## Project status
+## Current status
 
-This repository currently contains the desktop shell and first UI prototype. Mode selection and the command-entry prototype work in the renderer. Microphone capture, wake-word detection, AI provider connections, Windows appearance controls, lighting integrations, and persistent settings are not wired up yet.
+The repository contains the desktop shell and first UI prototype. Mode selection, keyboard activation, and manual resource snapshots are implemented in the code. Microphone capture, wake-word detection, AI provider connections, Windows appearance controls, lighting integrations, and persistent settings are not wired up yet.
 
-Those capabilities will be added in separate, testable steps. Yathu will show a clear listening state and should not silently perform disruptive desktop actions.
+Those capabilities will be added in separate, testable steps. Yathu should show a clear listening state and must not silently perform disruptive desktop actions.
 
 ## Design principles
 
@@ -49,7 +58,7 @@ Those capabilities will be added in separate, testable steps. Yathu will show a 
 - Electron + electron-vite
 - React + TypeScript
 - Lucide icons
-- CSS custom properties for mode-aware theming
+- Custom CSS with local system-font fallbacks
 
 ---
 
