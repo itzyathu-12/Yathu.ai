@@ -1,4 +1,4 @@
-import type { ResourceProcessSnapshot } from '../../../preload'
+import type { ResourceProcessSnapshot } from '../../preload'
 
 declare global {
   interface Window {
