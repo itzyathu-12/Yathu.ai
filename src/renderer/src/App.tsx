@@ -22,9 +22,20 @@ const suggestions = ['Start a 45-minute study session', 'Open my coding workspac
 export default function App() {
   const [mode, setMode] = useState<Mode>('Everyday')
   const [command, setCommand] = useState('')
-  const [listening, setListening] = useState(false)
   const [timerRunning, setTimerRunning] = useState(false)
   const [notice, setNotice] = useState('')
+  const [resourceUsage, setResourceUsage] = useState('Not measured')
+
+  async function checkResourceUsage() {
+    try {
+      const processes = await window.yathu.getResourceSnapshot()
+      const cpu = processes.reduce((total, item) => total + item.cpuPercent, 0)
+      const memory = processes.reduce((total, item) => total + item.workingSetMb, 0)
+      setResourceUsage(`${cpu.toFixed(1)}% CPU · ${memory.toFixed(0)} MB RAM`)
+    } catch {
+      setResourceUsage('Could not read resource usage')
+    }
+  }
 
   const activeMode = useMemo(() => modes.find((item) => item.name === mode)!, [mode])
 
@@ -38,7 +49,6 @@ export default function App() {
     else if (text.includes('everyday') || text.includes('normal')) setMode('Everyday')
     else setNotice('That command is ready for the assistant engine. Voice and AI actions are coming next.')
     setCommand('')
-    setListening(false)
   }
 
   return (
@@ -88,7 +98,7 @@ export default function App() {
               <h1>Good to have you<br /><em>back.</em></h1>
               <p className="welcome-sub">What are we getting into today?</p>
             </div>
-            <div className="date-card"><span>YOUR ASSISTANT</span><div className="assistant-status"><span className="online-dot" /> Standing by</div><div className="date-divider" /><small>Say <b>“Hey Yathu”</b> or press <kbd>Ctrl</kbd><kbd>Space</kbd></small></div>
+            <div className="date-card"><span>YOUR ASSISTANT</span><div className="assistant-status"><span className="online-dot" /> Standing by</div><div className="date-divider" /><small>Shortcut <kbd>Ctrl</kbd><kbd>Space</kbd> · Wake phrase “Hey Yathu” planned</small><div className="resource-row"><span>MICROPHONE <b>OFF</b></span><button onClick={checkResourceUsage}>Check resource use</button></div><small className="resource-reading">{resourceUsage}</small></div>
           </div>
 
           <section className="command-panel">
@@ -96,7 +106,7 @@ export default function App() {
             <div className="command-entry">
               <div className="entry-icon"><Command size={19} /></div>
               <input value={command} onChange={(e) => setCommand(e.target.value)} onKeyDown={(e) => e.key === 'Enter' && runCommand()} placeholder="What do you need, Yathu?" />
-              <button className={`mic-button ${listening ? 'listening' : ''}`} onClick={() => { setListening(!listening); setNotice('Microphone capture will be connected in the voice-engine phase.') }} aria-label="Toggle microphone"><Mic size={18} /></button>
+              <button className="mic-button mic-disabled" disabled aria-label="Microphone disabled" title="Microphone is disabled in this build"><Mic size={18} /></button>
               <button className="send-button" onClick={() => runCommand()} aria-label="Send command"><ArrowUpRight size={19} /></button>
             </div>
             <div className="suggestions">{suggestions.map((item) => <button key={item} onClick={() => { setCommand(item); runCommand(item) }}>{item}<ArrowUpRight size={12} /></button>)}</div>
