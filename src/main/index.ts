@@ -1,7 +1,19 @@
-import { app, BrowserWindow, globalShortcut } from 'electron'
+import { app, BrowserWindow, globalShortcut, ipcMain } from 'electron'
 import { join } from 'node:path'
 
 let mainWindow: BrowserWindow | null = null
+
+// Metrics are sampled only when the user explicitly requests them.
+// There is deliberately no background polling or monitoring timer.
+ipcMain.handle('yathu:get-resource-snapshot', () => {
+  return app.getAppMetrics().map((processInfo) => ({
+    pid: processInfo.pid,
+    type: processInfo.type,
+    cpuPercent: processInfo.cpu.percentCPUUsage,
+    workingSetMb: Math.round((processInfo.memory.workingSetSize / 1024) * 10) / 10,
+    privateMb: Math.round((processInfo.memory.privateBytes / 1024) * 10) / 10
+  }))
+})
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -39,6 +51,8 @@ function createWindow(): void {
 
 app.whenReady().then(() => {
   createWindow()
+
+  // One global shortcut; no resident command or AI worker is started here.
   globalShortcut.register('CommandOrControl+Space', () => {
     if (!mainWindow) createWindow()
     else {
@@ -47,6 +61,7 @@ app.whenReady().then(() => {
       mainWindow.focus()
     }
   })
+
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
