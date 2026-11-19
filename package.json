@@ -39,13 +39,8 @@
       "package.json"
     ],
     "win": {
-      "target": [
-        {
-          "target": "nsis",
-          "arch": ["x64"]
-        }
-      ],
-      "artifactName": "Yathu-Setup-${version}.${ext}"
+      "target": [{ "target": "nsis", "arch": ["x64"] }],
+      "artifactName": "Yathu-Setup.exe"
     },
     "nsis": {
       "oneClick": false,
